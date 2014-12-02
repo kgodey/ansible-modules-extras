@@ -87,7 +87,7 @@ EXAMPLES = """
 
 - name: Send notification message via Slack all options
   local_action:
-    module: slackdo
+    module: slack
     token: thetokengeneratedbyslack
     msg: "{{ inventory_hostname }} completed"
     channel: "#ansible"
