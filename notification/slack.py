@@ -26,11 +26,6 @@ description:
 version_added: 1.6
 author: Ramon de la Fuente <ramon@delafuente.nl>
 options:
-  domain:
-    description:
-      - Slack (sub)domain for your environment without protocol.
-        (i.e. C(future500.slack.com))
-    required: true
   token:
     description:
       - Slack integration token
@@ -87,14 +82,12 @@ EXAMPLES = """
 - name: Send notification message via Slack
   local_action:
     module: slack
-    domain: future500.slack.com
     token: thetokengeneratedbyslack
     msg: "{{ inventory_hostname }} completed"
 
 - name: Send notification message via Slack all options
   local_action:
-    module: slack
-    domain: future500.slack.com
+    module: slackdo
     token: thetokengeneratedbyslack
     msg: "{{ inventory_hostname }} completed"
     channel: "#ansible"
@@ -126,7 +119,7 @@ def build_payload_for_slack(module, text, channel, username, icon_url, icon_emoj
     payload="payload=" + module.jsonify(payload)
     return payload
 
-def do_notify_slack(module, domain, token, payload):
+def do_notify_slack(module, token, payload):
     slack_incoming_webhook = SLACK_INCOMING_WEBHOOK % (token)
 
     response, info = fetch_url(module, slack_incoming_webhook, data=payload)
@@ -137,7 +130,6 @@ def do_notify_slack(module, domain, token, payload):
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            domain      = dict(type='str', required=True),
             token       = dict(type='str', required=True),
             msg         = dict(type='str', required=True),
             channel     = dict(type='str', default=None),
@@ -151,7 +143,6 @@ def main():
         )
     )
 
-    domain = module.params['domain']
     token = module.params['token']
     text = module.params['msg']
     channel = module.params['channel']
@@ -162,7 +153,7 @@ def main():
     parse = module.params['parse']
 
     payload = build_payload_for_slack(module, text, channel, username, icon_url, icon_emoji, link_names, parse)
-    do_notify_slack(module, domain, token, payload)
+    do_notify_slack(module, token, payload)
 
     module.exit_json(msg="OK")
 
