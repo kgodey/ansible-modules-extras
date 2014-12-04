@@ -26,6 +26,11 @@ description:
 version_added: 1.6
 author: Ramon de la Fuente <ramon@delafuente.nl>
 options:
+  domain:
+    description:
+      - DEPRECATED. Slack (sub)domain for your environment without protocol.
+        (i.e. C(future500.slack.com))
+    required: false    
   token:
     description:
       - Slack integration token
@@ -131,6 +136,7 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             token       = dict(type='str', required=True),
+            domain      = dict(type='str', default=''),
             msg         = dict(type='str', required=True),
             channel     = dict(type='str', default=None),
             username    = dict(type='str', default='Ansible'),
@@ -144,6 +150,7 @@ def main():
     )
 
     token = module.params['token']
+    domain = module.params['domain']
     text = module.params['msg']
     channel = module.params['channel']
     username = module.params['username']
@@ -155,7 +162,10 @@ def main():
     payload = build_payload_for_slack(module, text, channel, username, icon_url, icon_emoji, link_names, parse)
     do_notify_slack(module, token, payload)
 
-    module.exit_json(msg="OK")
+    if domain:
+        module.exit_json(msg="OK. Warning: The domain parameter has been deprecated and will be removed in a future Ansible version. Please remove it from this task.")
+    else:
+        module.exit_json(msg="OK.")
 
 # import module snippets
 from ansible.module_utils.basic import *
