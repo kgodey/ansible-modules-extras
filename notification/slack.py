@@ -33,7 +33,7 @@ options:
     required: false    
   token:
     description:
-      - Slack integration token
+      - The token part of the Webhook URL, i.e. https://hooks.slack.com/services/C(thetoken/generated/byslack)
     required: true
   msg:
     description:
@@ -81,19 +81,24 @@ options:
     choices:
       - 'yes'
       - 'no'
+notes:
+  - Due to a change in the Slack API, the C(domain) parameter for this module was deprecated.
 """
 
 EXAMPLES = """
+The token can be found in the SlackHQ interface when configuring an Incoming WebHook.
+https://hooks.slack.com/services/`thetoken/generated/byslack`
+
 - name: Send notification message via Slack
   local_action:
     module: slack
-    token: thetokengeneratedbyslack
+    token: thetoken/generated/byslack
     msg: "{{ inventory_hostname }} completed"
 
 - name: Send notification message via Slack all options
   local_action:
     module: slack
-    token: thetokengeneratedbyslack
+    token: thetoken/generated/byslack
     msg: "{{ inventory_hostname }} completed"
     channel: "#ansible"
     username: "Ansible on {{ inventory_hostname }}"
